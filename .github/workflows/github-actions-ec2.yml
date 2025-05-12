@@ -51,15 +51,19 @@ jobs:
             # Switch to superuser to ensure permissions
             sudo su
 
+            # Navigate to the project directory
+            cd /home/ubuntu/Awscodepipelinesetup
+
+            # Pull the latest changes from the GitHub repository
+            git pull origin main
+
             # Ensure correct permissions for the project directory
             chown -R ubuntu:ubuntu /home/ubuntu/Awscodepipelinesetup
             chmod -R 755 /home/ubuntu/Awscodepipelinesetup
-
-            # Navigate to the project directory
-            cd /home/ubuntu/Awscodepipelinesetup
 
             # Install dependencies
             sudo npm install --unsafe-perm
 
             # Restart the application using PM2
             sudo pm2 restart all
+
