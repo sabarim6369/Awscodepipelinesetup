@@ -55,7 +55,7 @@ jobs:
             cd /home/ubuntu/Awscodepipelinesetup
 
             # Pull the latest changes from the GitHub repository
-            git pull origin main
+            sudo -u ubuntu git pull origin main
 
             # Ensure correct permissions for the project directory
             chown -R ubuntu:ubuntu /home/ubuntu/Awscodepipelinesetup
@@ -66,3 +66,4 @@ jobs:
 
             # Restart the application using PM2
             sudo pm2 restart all
+
