@@ -66,7 +66,4 @@ jobs:
 
             # Restart the application using PM2
             sudo pm2 restart all
-<<<<<<< HEAD
 
-=======
->>>>>>> c17325408691a40fe6ecd6f8b1f638d89691f11b
