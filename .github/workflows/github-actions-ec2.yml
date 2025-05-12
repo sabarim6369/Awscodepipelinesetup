@@ -1,0 +1,68 @@
+name: Push-to-EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2 on main branch push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v2
+
+      - name: Executing remote ssh commands using inline SSH key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ec2-98-80-14-44.compute-1.amazonaws.com
+          username: ubuntu
+          key: |
+            -----BEGIN RSA PRIVATE KEY-----
+            MIIEpAIBAAKCAQEA8sMeq2FeTdTeUPUXbSzF2bYZakJKGK0ZOSjvUvWPB3W2F4yB
+            3uJFxQaUXpRcryB5rHiEM+Y0+C4NbvBLJ816JoxX8WvGQUa7mSIfjuN02Bb9ZZ0H
+            wcnAVa0zKDymWRnwDyBBhIylzBRgAmSb0VLBI1YgX8H2fKccKt3dMmSGGowts5XE
+            af5jVBfbw7yJ9RMj/LXn8HBtVrNUtvu02ZTFo0mMYwthRYluiwLEXxLcebi+z4ac
+            UBMxgSWjdH6YcX7vbYz5Ws9dOzQsxiXzqoCRzAIwMFqLmVlTKdqVE4xwhyGWZlZd
+            5OCHRc9VlrdZfR7IXP/aWCqAI4gWwBKJlBq6xwIDAQABAoIBAQDaYJ+UN3CnvxeF
+            6BP8x8vq/p56McuJyxzniGVRUUgqw77cDC8/mnh8tmB9fCSr/SC2/2qdbTa1EmhP
+            JaXV1kdNqe3qZLLhQYm8RS/yT7ZqNLQZ1lqF/sEf0UA1r+lMOcLzOGb3n7X9kU6U
+            mIB6mmDXMsDIoyjiFUmHXjF/BWKFOVfPo6TVr/Q5axV2bmCql6AepEVGIo3moGF4
+            10Ze/5jGlOgb7rqQgGzqXpd27x6FqMOgeLvGPpx1/dFBX9f9mJ4UpZWaXxgpa8Nb
+            X+OZ+DX8n9s1B/4Kw/B5h6Os5TAjm/VVeG7XXrCb7mMXl1BERMzZusCF96NI1Ueq
+            QIJUh6ZhAoGBAPxbKzws0Y/55S5sgsPqXV/595I/NyUXqfYMVlL6FmgrFmslFcpn
+            gF6qK7xeo6dy/AdBcOw10HshQTvB5MDkh6cCmpjOjS+7N479JZMom3XSIg66dfbZ
+            fTW0dy+Zvj6BxKIO4pnBFBOCbM5uIl+AEqiYsWGuvqjYMfeaQsXyWwPPAoGBAPZE
+            fK5k1/M17vnLaSlUiacdjTSeeWJUftAlDdz16vFTj2kuyJDD6oU0pCF3p+u7gSAd
+            J8/XTuuKOGyrOQtvihdRRHkOcI+Dfuj7OoReBx5wXLActnpRiaXqWpN+cHlRtdAG
+            Ruh8f3ZL5VvtDhO9kx1iiRViKYuCXEbokOkD3n+JAoGBANjWmdLuC+/z4Sq/0Kj5
+            Y9yJVGKU8RRtPfyO40oPXFuL0oqkZhHyV4qAHG6Sv3qtwcOWRqqhHw/+Jihr1dyt
+            QaaPBToSGZ0O+JFkEfpd5R8bPWp8a8p9XSpddCAxshfRt50svycwkcilxEqotd5r
+            lRzLf3eZCHjatCy2n3OpaO1fAoGACZUEnOyDko0IrWOCxf7qFDyMH/4CjxbmkEbA
+            0VYoPBeaPud5GljlKSWxNTQorn1vOsano+imw3dvVpsa7xz57IpW9bbgHlVpfLs5
+            vajC8iZBFQEpAH1ns7L4r0B+M9pADsYPwEAH3Zx6YidJIu9/Z+dLmi9lmm4KFSA7
+            czWZVLECgYBxbu2WwhMY0TRx1fvHEUMYz1/ulYsQzInaraYPYpHYt5ov4fHnnWln
+            suE/MTJcojcIISfDEIAxsbhCW0MwwVvbOAwDvkbF4Ka8fWGOH5qljLFI2v3O7EqN
+            5pl6OeduOEZRA1VH4IgfIl54ttMci1UL1Z6bkxcMjNBY85DFFv0hPg==
+            -----END RSA PRIVATE KEY-----
+          script: |
+            # Switch to superuser to ensure permissions
+            sudo su
+
+            # Navigate to the project directory
+            cd /home/ubuntu/Awscodepipelinesetup
+
+            # Pull the latest changes from the GitHub repository
+            git pull origin main
+
+            # Ensure correct permissions for the project directory
+            chown -R ubuntu:ubuntu /home/ubuntu/Awscodepipelinesetup
+            chmod -R 755 /home/ubuntu/Awscodepipelinesetup
+
+            # Install dependencies
+            sudo npm install --unsafe-perm
+
+            # Restart the application using PM2
+            sudo pm2 restart all
